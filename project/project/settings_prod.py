@@ -73,13 +73,13 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'watersky.wsgi.application'
+WSGI_APPLICATION = 'project.wsgi.application'
 
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'watersky',
+        'NAME': 'yongdan',
         'PORT':'3306',
         'USER':'root',
         'PASSWORD':'Quattro!',
