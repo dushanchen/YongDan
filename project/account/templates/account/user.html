@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+{% if error %}
+  <div class="callout callout-danger">
+    <h4>{{error}}</h4>
+  </div>
+  {% endif %}
+
+  {% if info %}
+  <div class="callout callout-success">
+    <h4>{{info}}</h4>
+  </div>
+  {% endif %}
+
+<link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker-bs3.css' %}">
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-body">
+                <form action="" method='post' class="form-inline" id='query_form'>
+                  {% csrf_token %}
+                    会员号: <input type="text" class="form-control input-sm" name="name" placeholder="会员号" value="{{ name }}">
+                    手机号: <input type="text" class="form-control input-sm" name="phone" placeholder="手机号" value='{{phone}}'>
+
+                    <input type='hidden' name='action' value='search' />
+                    <input type='hidden' name='page' id='page' value='1' />
+                    <input type='hidden' name='pagesize' id='pagesize' value='{{ pagesize }}' />
+                    <input type="submit" class="btn btn-success pull-right" value="查询">
+                </form>
+            </div>
+        </div>
+
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">
+              <button type="button" data-toggle="modal" data-target="#modalNew" class="btn btn-success">新增账号</button>
+          </h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <table class="table table-hover table-bordered">
+                <tbody>
+                <tr>
+                  <th>会员号</th>
+                  <th>手机号</th>
+                  <th>角色</th>
+                  <th>创建时间</th>
+                  <th>更新时间</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+                {% for user in objects %}
+                <tr>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.phone | default:'' }}</td>
+                  
+                  <td>{% for r in user.role.all %}
+                      	{{ r.name }} ,
+                      {% empty %}无
+                      {% endfor %} 
+                  </td>
+                  <td>{{ user.create_time|date:"Y-m-d H:i:s"}}</td>
+                  <td>{{ user.update_time|date:"Y-m-d H:i:s"}}</td>
+                  <td>{{ user.get_status_display }}</td>
+                  <td>
+                    <button data-toggle="modal" data-target="#modalEdit__{{user.id}}" class="btn btn-success">修改</button>
+                    <button data-toggle="modal" data-target="#modalEditPassword__{{user.id}}" class="btn btn-success">修改密码</button>
+                    {% if 'user_edit_role' in request.session.authority %}
+                    <button data-toggle="modal" data-target="#modalEditRole__{{user.id}}" class="btn btn-success">修改角色</button>
+                    {% endif %}
+                    {% if 'user_status' in request.session.authority %}
+                    {% if user.status == 0 %}
+                    <button class="btn btn-success updateStatus" status=0 id='{{user.id}}'>停用</button>
+                    {% else %}
+                    <button class="btn btn-success updateStatus" status=1 id='{{user.id}}'>启用</button>
+                    {% endif %}
+                    {% endif %}
+                  </td>
+                </tr>
+
+
+                <div id="modalEdit__{{user.id}}" class="modal fade">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span></button>
+                          <h6 class="modal-title">
+                            编辑用户
+                          </h6>
+                        </div>
+                        <div class="modal-body">
+                          <form action="" method="post" class="form-group">
+                            {% csrf_token %}
+                            <p>用户名</p>
+                            <p>
+                              <input type="text" class="form-control" name='name' placeholder="用户名" value="{{user.name}}"/>
+                            </p>
+                            
+                            <p>手机号</p>
+                            <p>
+                              <input type="text" class="form-control" name='phone' placeholder="手机号" value="{{user.phone}}" />
+                            </p>
+                            <input type="hidden" name="action" value="edit" />
+                            <input type="hidden" name="id" value="{{ user.id }}" />
+                            <br>
+                            <input type="submit" class="btn btn-sm btn-success pull-right" value="保存" />
+                            <br>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <div id="modalEditPassword__{{user.id}}" class="modal fade">
+                      <div class="modal-dialog modal-default">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span></button>
+                            <h6 class="modal-title">
+                              修改密码
+                            </h6>
+                          </div>
+                          <div class="modal-body">
+                            <form action="/operate/platform/" method="post">
+                               {% csrf_token %}
+                              <div class="form-group">
+                                <label>密码</label>
+                                <input type="password" class="form-control" name="password" placeholder="密码" />
+                              </div>
+                              <div class="form-group">
+                                <label>确认密码</label>
+                                <input type="password" class="form-control" name="confirm_password" placeholder="确认密码" />
+                              </div>
+                              <input type="hidden" name="action" value="edit_passwod" />
+                              <input type="hidden" name="id" value="{{ user.id }}" />
+                              <div class="form-group">
+                                <input type="submit" class="btn btn-sm btn-success pull-right" value="确定" />
+                              </div>
+                            </form>
+                          </div>
+                          <div class="modal-footter">
+                            <br>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <div>
+                    <div id="modalDisable__{{user.id}}" class="modal fade">
+                      <div class="modal-dialog modal-danger">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span></button>
+                            <h6 class="modal-title">
+                              禁用/启用用户
+                            </h6>
+                          </div>
+                          <div class="modal-body">
+                            <form action="/user/user_curd/" method="post" class="form-group">
+                              {% csrf_token %}
+                              {% if user.status == 0%}
+                              <p>确定停用用户吗？</p>
+                              {% else %}
+                              <p>确定要启用用户吗？</p>
+                              {% endif %}
+                              <input type="hidden" name="action" value="disable" />
+                              <input type="hidden" name="user_id" value="{{ user.id }}" />
+                              <input type="submit" class="btn btn-default" value="确定" />
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+              {% empty %}
+                  <tr class="text-center">
+                      <td colspan="7">无数据</td>
+                  </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <br>
+            <div class="dataTables_paginate paging_simple_numbers">
+              <ul class="pagination">
+                  {% if objects.has_previous %}
+                  <li class="paginate_button previous">
+                      <a onclick="$('input[name=page]').val({{ objects.previous_page_number }});$('#query_form').submit();">上一页</a>
+                  </li>
+                  {% endif %}
+                  {% for i in objects.paginator.page_range %}
+                  <li {% ifequal i  user.number %}class="paginate_button active" {% else %}class="paginate_button"{% endifequal %}>
+                      <a onclick="$('input[name=page]').val({{ i }});$('#query_form').submit();">{{ i }}</a>
+                  </li>
+                  {% endfor %}
+                  {% if objects.has_next %}
+                  <li class="paginate_button next">
+                      <a onclick="$('input[name=page]').val({{ objects.next_page_number }});$('#query_form').submit();" >下一页</a>
+                  </li>
+                  {% endif %}
+              </ul>
+          </div>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+    </div>
+    <!-- /.col -->
+  </div>
+
+
+    <div>
+        <div id="modalNew" class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+                <h6 class="modal-title">
+                  新增用户
+                </h6>
+              </div>
+              <div class="modal-body">
+                <form action="" method="post" id='form' >
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <label>账户名</label>
+                    <input type="text" class="form-control" name="name" placeholder="账户名" />
+                  </div>
+                  <div class="form-group">
+                    <label>手机号</label>
+                    <input type="text" class="form-control" name="phone" placeholder="手机号" />
+                  </div>
+                  <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" class="form-control" name="password" placeholder="密码" />
+                  </div>
+                  <div class="form-group">
+                    <label>确认密码</label>
+                    <input type="password" class="form-control" name="confirm_password" placeholder="确认密码" />
+                  </div>
+                  <div class="form-group">
+                    <input type="submit" class="btn btn-sm btn-success pull-right" value="确定" />
+                  </div>
+                  <input type="hidden" name="action" value="add" />
+                </form>
+                <div class="modal-footter">
+                  <br>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+  $(document).ready(function(){
+
+  	///// 表单验证
+    $('#form').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            live: 'enabled',
+            fields: {
+                name: {
+                    message: '用户名验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '用户名不能为空'
+                        },
+                        stringLength: {
+                            min: 2,
+                            max: 18,
+                            message: '用户名长度必须在6到18位之间'
+                        },
+                        remote: { 
+                           url: '',//验证地址
+                           message: '用户已存在',//提示消息
+                           delay :  2000,//每输入一个字符，就发ajax请求，服务器压力还是太大，设置2秒发送一次ajax（默认输入一个字符，提交一次，服务器压力太大）
+                           type: 'POST',//请求方式
+                           data: function(validator) {
+                                 return {
+                                     name: $('#add_name').val(),
+                                     action: 'validate_name',
+                                 };
+                              }
+                       },
+                    }
+                },
+
+                phone: {
+                    validators: {
+                        notEmpty: {
+                            message: '手机号不能为空'
+                        },
+                        regexp: {
+                            regexp: /^1[34578]\d{9}$/,
+                            message: '手机号格式有误'
+                        }
+                    }
+                },
+                password: {
+                    message: '密码验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '密码不能为空'
+                        },
+                        stringLength: {
+                            min: 6,
+                            max: 18,
+                            message: '密码必须在6到18位之间'
+                        }
+                    }
+                },
+                confirm_password: {
+                    message: '密码验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '密码不能为空'
+                        },
+                        identical: {
+                                  field: 'password',
+                                  message: '两次输入密码不一致！'
+                        },
+                    }
+                },
+                
+            }
+        });
+    setTimeout(function(){
+      $('input[type=password]').val('')
+    },1000)
+
+})
+</script>
+
+{% endblock %}

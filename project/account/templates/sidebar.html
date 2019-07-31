@@ -1,0 +1,186 @@
+ {% load static %}
+
+<aside class="main-sidebar">
+  <!-- sidebar: style can be found in sidebar.less -->
+  <section class="sidebar">
+    <!-- Sidebar user panel -->
+    <div class="user-panel">
+      <div class="pull-left image">
+        <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle" alt="User Image">
+      </div>
+      <div class="pull-left info">
+        <p>{{ request.session.user_name }}</p>
+        <a href=""><i class="fa fa-circle text-success"></i> 在线</a>&nbsp;<a href='/operate/login_out/'>退出</a>
+      </div>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="header">功能导航</li>
+
+      {% if 'enterprise' in request.session.authority %}
+      <li class="treeview {% if menu == 'enterprise' %}active{% endif %}">
+        <a href='/operate/enterprise/'>
+          <i class="fa fa-group"></i>
+          <span>企业用户管理</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if 'user_platform' in request.session.authority %}
+       <li class="treeview {% if menu == 'platform' %}active{% endif %}">
+        <a href='/operate/platform/'>
+          <i class="fa fa-user"></i>
+          <span>平台用户管理</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if 'role_list' in request.session.authority %}
+      <li class="treeview {% if menu == 'role' %}active{% endif %}">
+        <a href='/operate/role/'>
+          <i class="fa fa-street-view"></i>
+          <span>角色管理</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if 'fee_setup' in request.session.authority %}
+      <li class="treeview {% if menu == 'fee_setup' %}active{% endif %}">
+        <a href='/operate/fee_setup/'>
+          <i class="fa fa-gear"></i>
+          <span>资费配置</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if 'bill' in request.session.authority %}
+      <li class="treeview {% if menu == 'bill' %}active{% endif %}">
+        <a href='/operate/bill/'>
+          <i class="fa fa-credit-card"></i>
+          <span>账单管理</span>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ticket' in request.session.authority %}
+      <li class="treeview {% if menu == 'ticket' %}active{% endif %}">
+        <a href='/operate/ticket/'>
+          <i class="fa fa-ticket"></i>
+          <span>开票管理</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if 'equipment' in request.session.authority %}
+      <li class="treeview {% if menu == 'equipment' %}active{% endif %}">
+        <a href='/operate/equipment/'>
+          <i class="fa fa-video-camera"></i>
+          <span>设备管理</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if 'blacklist' in request.session.authority %}
+      <li class="treeview {% if menu == 'black_name' %}active{% endif %}">
+        <a href='/operate/blackName/'>
+          <i class="fa fa-tv"></i>
+          <span>人脸库</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if 'enteprise_msg' in request.session.authority %}
+      <li class="treeview {% if menu == 'enterprise_msg' %}active{% endif %}">
+        <a href='/operate/enterpriseMsg/'>
+          <i class="fa fa-commenting"></i>
+          <span>发送消息</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if 'log' in request.session.authority %}
+      <li class="treeview {% if menu == 'log' %}active{% endif %}">
+        <a href='/operate/log/'>
+          <i class="fa fa-pencil-square-o"></i>
+          <span>系统日志</span>
+        </a>
+      </li>
+      {% endif %}
+      <!-- {% if 'setup' in request.session.authority %}
+      <li class="treeview {% if menu == 'setup' %}active{% endif %}">
+        <a href='/operate/setup/'>
+          <i class="fa fa-gear"></i>
+          <span>参数配置</span>
+        </a>
+      </li>
+      {% endif %} -->
+      {% if 'alter_password' in request.session.authority %}
+      <li class="treeview {% if menu == 'user_pass' %}active{% endif %}">
+        <a href="/operate/alterpassword/">
+          <i class="fa fa-lock"></i>
+          <span>修改密码</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </section>
+  <!-- /.sidebar -->
+</aside>
+<!-- <div id="add_group" class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+                <h3 class="modal-title">
+                  创建群
+                </h3>
+              </div>
+              <div class="modal-body">
+                <form action="/group/" method="post" class="form-group">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="create" />
+                    <p>群名称</p>
+                  <p>
+                    <input type="text" class="form-control" name='group_name' placeholder="群名称" onkeyup='check(this)'>
+                  </p>
+                  <input type="submit" class="btn btn-sm btn-success" disabled value="确定" />
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>-->
+        <!-- 删除群 -->
+        <div id="delete_group_form" class="modal fade">
+          <div class="modal-dialog modal-danger">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+                <h6 class="modal-title">
+                  删除群
+                </h6>
+              </div>
+              <div class="modal-body">
+                <form action="/group/" method="post" class="form-group">
+                  {% csrf_token %}
+                  <p>确定要删除<span id='delete_group_name'></span>吗？</p>
+                  <input type="hidden" name="action" value="delete" />
+                  <input type="hidden" id="delete_group_id" name="group_id" />
+                  <input type="submit" class="btn btn-default" value="确定" />
+                </form>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+
+          </div>
+          <!-- /.modal-dialog -->
+        </div> -->
+<script type="text/javascript">
+
+</script>
+<style type="text/css">
+.glyphicon-minus:hover{
+  cursor:pointer;
+  color:red;
+}
+</style>

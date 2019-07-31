@@ -1,0 +1,8 @@
+*.pyc
+.DS_Store
+media
+*.json
+*.jl
+out.txt
+err.txt
+dump.rdb
