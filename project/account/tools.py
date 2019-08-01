@@ -16,11 +16,9 @@ def _page_aop_(func):
         result = func(request, *args, **kwargs)
 
         if isinstance(result, tuple):
-            print(result)
             res = result[0]
             res['pagesize'] = pagesize
             res['page'] = page
-            print(res)
             paginator = Paginator(res['objects'], pagesize) 
             try:
                 res['objects'] = paginator.page(page)
@@ -49,8 +47,7 @@ def _check_user_(func):
     
         url = request.path
         method = request.method
-        print(url)
-        print(method)
+     
         if method == 'POST':
             action = request.POST.get('action', '')
         else:
@@ -59,13 +56,12 @@ def _check_user_(func):
             url = url + '?action=' + action
         
         urls = request.session['urls']
-        print(urls)
+        
         if 'Admin' not in request.session['role']:
             if url not in urls or urls[url] != method:
                 ctx = {'error':'权限拒绝'}
                 return render(request, 'error.html', ctx)
 
-        print(request.session['role'])
         return func(request, *args, **kwargs)
 
     return view
