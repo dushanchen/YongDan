@@ -1,5 +1,6 @@
 service supervisor start
 service nginx start
+service mysql start
 
 cd /root/project/YongDan
 git fetch 

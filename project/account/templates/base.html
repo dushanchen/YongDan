@@ -126,6 +126,20 @@
 
 {% block script %}
 
+  {% if error %}
+    <div class="callout callout-danger">
+      <h4>{{error}}</h4>
+    </div>
+  {% endif %}
+
+  {% if info %}
+    <div class="callout callout-success">
+      <h4>{{info}}</h4>
+    </div>
+  {% endif %}
+
+
+
 {% endblock %}
 
 </body>

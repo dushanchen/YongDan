@@ -21,22 +21,20 @@ def logout(request):
 def user(request):
     ctx = {}
 
-    Dan = User
-
-    ctx['objects'] = objs = Dan.objects.all()
+    ctx['objects'] = objs = User.objects.all()
 
     if request.method == 'POST':
         
         action = request.POST.get('action', '')
 
-        _add_edit_del_(Dan, request, action)
+        _add_edit_del_(User, request, action)
 
         if action == 'search': # 自定义查询
             pass
 
         if action == 'validate_name': # 自定义ajax交互
             name = request.POST.get('name', '')
-            if Dan.objects.filter(name=name).exists():
+            if User.objects.filter(name=name).exists():
                 return JsonResponse({'valid': False})
             else:
                 return JsonResponse({'valid': True})

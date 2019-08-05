@@ -3,19 +3,7 @@
 {% load static %}
 
 {% block content %}
-{% if error %}
-  <div class="callout callout-danger">
-    <h4>{{error}}</h4>
-  </div>
-  {% endif %}
 
-  {% if info %}
-  <div class="callout callout-success">
-    <h4>{{info}}</h4>
-  </div>
-  {% endif %}
-
-<link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker-bs3.css' %}">
 <div class="row">
     <div class="col-xs-12">
         <div class="box">
@@ -150,34 +138,6 @@
                       </div>
                     </div>
                   </div>
-                <div>
-                    <div id="modalDisable__{{user.id}}" class="modal fade">
-                      <div class="modal-dialog modal-danger">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">×</span></button>
-                            <h6 class="modal-title">
-                              禁用/启用用户
-                            </h6>
-                          </div>
-                          <div class="modal-body">
-                            <form action="/user/user_curd/" method="post" class="form-group">
-                              {% csrf_token %}
-                              {% if user.status == 0%}
-                              <p>确定停用用户吗？</p>
-                              {% else %}
-                              <p>确定要启用用户吗？</p>
-                              {% endif %}
-                              <input type="hidden" name="action" value="disable" />
-                              <input type="hidden" name="user_id" value="{{ user.id }}" />
-                              <input type="submit" class="btn btn-default" value="确定" />
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
               {% empty %}
                   <tr class="text-center">
@@ -187,25 +147,9 @@
             </tbody>
           </table>
           <br>
-            <div class="dataTables_paginate paging_simple_numbers">
-              <ul class="pagination">
-                  {% if objects.has_previous %}
-                  <li class="paginate_button previous">
-                      <a onclick="$('input[name=page]').val({{ objects.previous_page_number }});$('#query_form').submit();">上一页</a>
-                  </li>
-                  {% endif %}
-                  {% for i in objects.paginator.page_range %}
-                  <li {% ifequal i  user.number %}class="paginate_button active" {% else %}class="paginate_button"{% endifequal %}>
-                      <a onclick="$('input[name=page]').val({{ i }});$('#query_form').submit();">{{ i }}</a>
-                  </li>
-                  {% endfor %}
-                  {% if objects.has_next %}
-                  <li class="paginate_button next">
-                      <a onclick="$('input[name=page]').val({{ objects.next_page_number }});$('#query_form').submit();" >下一页</a>
-                  </li>
-                  {% endif %}
-              </ul>
-          </div>
+          
+          {% include 'page.html'%}
+          
         </div>
         <!-- /.box-body -->
       </div>
